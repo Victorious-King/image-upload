@@ -39,8 +39,6 @@ async function getImageUrls () {
   const url = 'http://localhost:9090'
 
   const res = await Axios.get(`${url}/collections?is_popular=true`)
-
-  
   res.data.data.results.map(d => {
     if (!Fs.existsSync(`images/${d.contract_id}`)){
       Fs.mkdirSync(`images/${d.contract_id}` );
@@ -56,18 +54,19 @@ async function main() {
 
   const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-  res.map(async d => {
-    await delay(1000)
-    await d['tokens'].map(async t => {
-      await delay(1000)
+  for(let i = 0; i < res.length; i++) { 
+    const tokens = await Axios.get(`http://localhost:9090/tokens?nft_contract_id=${res[i].contract_id}&__limit=10000`)
+    const token = tokens.data.data.results
+    for(let j = 0; j < token.length; j++) {
       try {
-        await downloadImage(`images/${d.contract_id}`, t.media_url)
+        await downloadImage(`images/${res[i].contract_id}`, token[j].media_url)
       } catch (error) {
         console.error(error)
-        wrongURLs.push(t.media_url)        
+        wrongURLs.push(token[j].media_url)        
       }
-    })
-  })
+     }
+  }
+  
 
   var file = Fs.createWriteStream('array.txt');
   file.on('error', function(err) { /* error handling */ });
