@@ -1,0 +1,27 @@
+{
+  "name": "image-upload",
+  "version": "1.0.0",
+  "description": "download images from pinata and upload to aws s3",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Victorious-King/image-upload.git"
+  },
+  "keywords": [
+    "AWS"
+  ],
+  "author": "Victorious King",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Victorious-King/image-upload/issues"
+  },
+  "homepage": "https://github.com/Victorious-King/image-upload#readme",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "progress": "^2.0.3"
+  }
+}
