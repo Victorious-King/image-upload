@@ -51,27 +51,55 @@ async function getImageUrls () {
 async function main() {
 
   const res = await getImageUrls()
+  const contract_id = 'cartel.neartopia.near'
 
   const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-  for(let i = 0; i < res.length; i++) { 
-    const tokens = await Axios.get(`http://localhost:9090/tokens?nft_contract_id=${res[i].contract_id}&__limit=10000`)
-    const token = tokens.data.data.results
-    for(let j = 0; j < token.length; j++) {
-      try {
-        await downloadImage(`images/${res[i].contract_id}`, token[j].media_url)
-      } catch (error) {
-        console.error(error)
-        wrongURLs.push(token[j].media_url)        
-      }
-     }
-  }
+  // for(let i = 0; i < res.length; i++) { 
+  // }
+  const tokens = await Axios.get(`http://localhost:9090/tokens?nft_contract_id=${contract_id}&__limit=10000`)
+  const token = tokens.data.data.results
+  for(let j = 0; j < token.length; j++) {
+    try {
+      await delay(3000)
+      await downloadImage(`images/${contract_id}`, token[j].media_url)
+    } catch (error) {
+      wrongURLs.push(token[j].media_url)   
+      console.error(`error:${error}`, token[j].media_url)     
+    }
+   }
   
 
-  var file = Fs.createWriteStream('array.txt');
+  const file = Fs.createWriteStream('array.txt');
   file.on('error', function(err) { /* error handling */ });
-  wrongURLs.forEach(function(v) { file.write(v.join(', ') + '\n'); });
+  wrongURLs.forEach(function(v) { file.write(v + '\n'); });
   file.end();
 }
 
-main()
+async function readUrlsFromFile() {
+  const contract_id = 'cartel.neartopia.near'
+  const temp = []
+  const text = Fs.readFileSync("array.txt").toString('utf-8');
+  const textByLine = text.split("\n")
+
+  const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+  for(let i = 0; i < textByLine.length; i++) {
+    try {
+      await delay(3000)
+      await downloadImage(`images/${contract_id}`, textByLine[i])
+    } catch (error) {
+      temp.push(textByLine[i])   
+      console.error(`error:${error}`, textByLine[i])     
+    }
+  }
+
+  const file = Fs.createWriteStream('array.txt');
+  file.on('error', function(err) { /* error handling */ });
+  temp.forEach(function(v) { file.write(v + '\n'); });
+  file.end();
+
+}
+
+readUrlsFromFile()
+// main()
